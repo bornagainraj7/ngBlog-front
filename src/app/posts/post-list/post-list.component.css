@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  margin-top: 1rem;
+}
+
+.post-content {
+  width: 90%;
+  margin: 20px auto;
+}
+
+.post-image {
+  width: 90%;
+  margin: 0px auto;
+}
+
+.post-image img {
+  width: 100%;
+  margin: auto;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+mat-paginator {
+  margin-top: 10px;
+}
