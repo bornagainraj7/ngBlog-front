@@ -4,6 +4,11 @@ import { Post } from './post.model';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { url } from 'inspector';
+
+import { environment } from './../../environments/environment';
+
+const URL = `${environment.apiUrl}/posts`;
 
 @Injectable({
   providedIn: 'root'
@@ -19,14 +24,15 @@ export class PostsService {
 
   getPosts(pageSize: number, currentPage: number) {
     const params = `?pagesize=${pageSize}&page=${currentPage}`;
-    this.http.get<{ message: string, data: any, count: number }>('http://localhost:3000/api/posts' + params)
+    this.http.get<{ message: string, data: any, count: number }>(`${URL}${params}`)
     .pipe(map((postData) => {
       return { posts: postData.data.map(post => {
         return {
           id: post._id,
           title: post.title,
           content: post.content,
-          imagePath: post.imagePath
+          imagePath: post.imagePath,
+          creator: post.creator
         };
       }), count: postData.count };
     }))
@@ -43,7 +49,7 @@ export class PostsService {
   }
 
   getSinglePost(id: string) {
-    return this.http.get<{data: any, message: string}>('http://localhost:3000/api/posts/' + id);
+    return this.http.get<{data: any, message: string}>(`${URL}/${id}`);
   }
 
   addPost(title: string, content: string, image: File) {
@@ -52,7 +58,7 @@ export class PostsService {
     postData.append('title', title);
     postData.append('content', content);
     postData.append('image', image, 'image');
-    this.http.post<{ message: string, data: Post }>('http://localhost:3000/api/posts', postData)
+    this.http.post<{ message: string, data: Post }>(URL, postData)
     .subscribe(res => {
       this.router.navigate(['/']);
     }, error => {
@@ -71,9 +77,9 @@ export class PostsService {
       postData.append('content', content);
       postData.append('image', image, 'image');
     } else {
-      postData = { id, title, content, imagePath: image };
+      postData = { id, title, content, imagePath: image, creator: null };
     }
-    this.http.put<{ message: string, data: any }>('http://localhost:3000/api/posts/' + id, postData)
+    this.http.put<{ message: string, data: any }>(`${URL}/${id}`, postData)
     .subscribe(res => {
       // const post: Post = { id, title, content, imagePath: res.data.imagePath };
       // const updatedPosts = [...this.posts];
@@ -88,6 +94,6 @@ export class PostsService {
   }
 
   deletePost(postId) {
-    return this.http.delete('http://localhost:3000/api/posts/' + postId);
+    return this.http.delete(`${URL}/${postId}`);
   }
 }

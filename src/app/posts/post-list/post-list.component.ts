@@ -12,11 +12,7 @@ import { UserService } from 'src/app/users/user.service';
 })
 export class PostListComponent implements OnInit, OnDestroy {
 
-  // posts = [
-  //   { title: 'Post One', content: 'This is First Post!' },
-  //   { title: 'Post Two', content: 'This is Second Post!' },
-  //   { title: 'Post Three', content: 'This is Third Post!' },
-  // ];
+
   posts: Post[] = [];
   private postsSub: Subscription;
   isLoading = false;
@@ -28,15 +24,18 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   private authStatusSubs: Subscription;
   userAuthenticated = false;
+  userId: string;
 
   constructor(private postService: PostsService, private userService: UserService) { }
 
   ngOnInit() {
     this.fetchPosts();
     this.userAuthenticated = this.userService.getIsAuth();
+    this.userId = this.userService.getUserId();
     this.authStatusSubs = this.userService.getAuthStatusListener()
     .subscribe(auth => {
       this.userAuthenticated = auth;
+      this.userId = this.userService.getUserId();
     });
   }
 
@@ -56,6 +55,8 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.postService.deletePost(id)
     .subscribe(() => {
       this.fetchPosts();
+    }, error => {
+      this.isLoading = false;
     });
   }
 
